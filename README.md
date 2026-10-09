@@ -114,6 +114,16 @@ Two Grafana dashboards live in `dashboards/` as provision-ready JSON:
   break-even progress gauge, distance driven, the estimated break-even date,
   and cumulative/weekly savings timeseries.
 
+### Screenshots
+
+`ev-fuel-savings` — gross and net fuel savings over time:
+
+![ev-fuel-savings dashboard](pictures/ev-fuel-savings.png)
+
+`ev-roi` — net savings, break-even progress, and estimated break-even date:
+
+![ev-roi dashboard and break-even date](pictures/ev-roi-and-break-even.png)
+
 Both dashboards read TeslaMate's Postgres tables plus the `fuel.prices` table
 created by this project, through a datasource whose UID is **`TeslaMate`**.
 Before importing, point them at your own datasource: either keep your
@@ -177,9 +187,6 @@ The fuel prices come from the Italian **MASE** (Ministero dell'Ambiente e della
 Sicurezza Energetica) weekly price report. The feed is fetched **at runtime** by
 `fetch.sh`; no MASE dataset is committed to this repository or redistributed.
 You are responsible for complying with MASE's own reuse and attribution terms.
-
-To stay clear of TeslaMate's AGPL-3.0 licensing, the upstream Trip dashboard's
-"Comparison with ICE" panel is **intentionally not included** in this project.
 
 Released under the MIT License — see [`LICENSE`](LICENSE).
 
