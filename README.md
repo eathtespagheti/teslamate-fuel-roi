@@ -80,6 +80,7 @@ From the repository root, create the database Secret and apply the Kustomize
 overlay:
 
 ```sh
+# PGPASSWORD must already be exported in your shell to your TeslaMate DB password.
 kubectl -n teslamate create secret generic fuel-roi-db \
   --from-literal=PGHOST=teslamate-postgres-rw \
   --from-literal=PGPORT=5432 \

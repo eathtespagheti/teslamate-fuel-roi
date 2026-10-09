@@ -11,9 +11,9 @@ shellcheck-and-smoke-test:
     - name: postgres:18-alpine
       alias: postgres
       variables:
+        # Throwaway CI database: trust auth, so no password is stored or sent.
         POSTGRES_HOST_AUTH_METHOD: trust
   variables:
-    POSTGRES_HOST_AUTH_METHOD: trust
     PGHOST: postgres
     PGPORT: "5432"
     PGUSER: postgres

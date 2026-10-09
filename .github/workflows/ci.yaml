@@ -13,6 +13,7 @@ jobs:
       postgres:
         image: postgres:18-alpine
         env:
+          # Throwaway CI database: trust auth, so no password is stored or sent.
           POSTGRES_HOST_AUTH_METHOD: trust
         ports:
           - 5432:5432
