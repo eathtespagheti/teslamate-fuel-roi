@@ -1,7 +1,8 @@
-# GitLab CI (primary): lint the scripts and run the full test suite against a
-# throwaway PostgreSQL service.
+# GitLab CI (primary): lint the scripts, run the full test suite against a
+# throwaway PostgreSQL service, and publish the container image.
 stages:
   - test
+  - build
 
 shellcheck-and-smoke-test:
   stage: test
@@ -24,3 +25,26 @@ shellcheck-and-smoke-test:
   script:
     - shellcheck scripts/*.sh
     - sh test/run.sh
+
+# Publish the image to the GitLab Container Registry with rootless BuildKit
+# (no privileged job pods). Runs on release tags only; the cluster's Flux image
+# automation watches `vX.Y.Z` tags.
+build-image:
+  stage: build
+  image:
+    name: moby/buildkit:rootless
+    entrypoint: [""]
+  variables:
+    BUILDKITD_FLAGS: --oci-worker-no-process-sandbox
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^v[0-9]+\.[0-9]+\.[0-9]+$/'
+  before_script:
+    - mkdir -p ~/.docker
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"username\":\"$CI_REGISTRY_USER\",\"password\":\"$CI_REGISTRY_PASSWORD\"}}}" > ~/.docker/config.json
+  script:
+    - |
+      buildctl-daemonless.sh build \
+        --frontend dockerfile.v0 \
+        --local context=. \
+        --local dockerfile=docker \
+        --output type=image,name=$CI_REGISTRY_IMAGE:$CI_COMMIT_TAG,push=true
