@@ -16,6 +16,31 @@
 
 ## Quick start (Docker Compose)
 
+From the `docker/` directory, copy the example environment file and fill in your
+TeslaMate Postgres credentials (`.env` is gitignored):
+
+```sh
+cd docker
+cp .env.example .env
+$EDITOR .env          # set PGHOST, PGPORT, PGUSER, PGPASSWORD, PGDATABASE
+```
+
+Then run one fetch-and-import cycle:
+
+```sh
+docker compose run --rm fuel-roi
+```
+
+The `fuel-roi` service is a one-shot job: the image's entrypoint runs
+`fetch.sh` then `import.sh` and the container exits. There is no long-running
+scheduler container — run it weekly from the host with cron or a systemd timer.
+For example, this cron line runs it every Monday at 20:00, after MASE publishes
+the weekly report:
+
+```
+0 20 * * 1  cd /path/to/teslamate-fuel-roi/docker && docker compose run --rm fuel-roi
+```
+
 ## Quick start (Kubernetes)
 
 ## Dashboards

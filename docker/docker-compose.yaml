@@ -1,0 +1,5 @@
+services:
+  fuel-roi:
+    image: teslamate-fuel-roi:dev
+    env_file: .env
+    restart: "no"
