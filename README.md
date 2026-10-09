@@ -4,6 +4,16 @@
 
 ## Prerequisites
 
+- A running TeslaMate Postgres, reachable through libpq's standard `PG*`
+  environment variables (`PGHOST`, `PGPORT`, `PGUSER`, `PGPASSWORD`,
+  `PGDATABASE`).
+- A database user that can `CREATE SCHEMA fuel`. The image creates the schema
+  and tables on first run; it only ever writes inside `fuel`.
+- Outbound HTTPS to `sisen.mase.gov.it`, the MASE weekly-price feed.
+- Docker, for the `teslamate-fuel-roi` image. Its entrypoint runs `fetch.sh`
+  then `import.sh`, so one container run downloads the report, validates it,
+  and imports any previously unseen dates.
+
 ## Quick start (Docker Compose)
 
 ## Quick start (Kubernetes)
