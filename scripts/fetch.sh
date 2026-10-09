@@ -15,7 +15,7 @@ CSV_FILE="$(mktemp)"
 trap 'rm -f "$DATA_FILE" "$CSV_FILE"' EXIT
 
 echo "Downloading weekly fuel prices..."
-curl -fsSL --retry 3 --retry-delay 5 \
+curl -fsSL --retry 3 --retry-delay 5 --connect-timeout 10 --max-time 60 \
   -A "Mozilla/5.0" -H "Accept: application/json" \
   "$MASE_URL" -o "$DATA_FILE"
 

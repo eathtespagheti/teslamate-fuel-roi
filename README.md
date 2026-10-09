@@ -20,11 +20,8 @@ timer, or as a Kubernetes `CronJob`. The `ev-fuel-savings` dashboard reports
 gross and net fuel savings; `ev-roi` tracks net savings against a configurable EV
 purchase price and estimates a break-even date.
 
-The design and plan for this extraction live in the `home-cluster` repo under
-`/home/fabio/Projects/home-cluster/docs/superpowers/`:
-
-- `docs/superpowers/specs/2026-10-09-teslamate-fuel-roi-design.md` (design)
-- `docs/superpowers/plans/2026-10-09-teslamate-fuel-roi.md` (plan)
+The design and plan for this extraction are maintained by the author and are
+not published at a public URL.
 
 ## Prerequisites
 
@@ -37,6 +34,18 @@ The design and plan for this extraction live in the `home-cluster` repo under
 - Docker, for the `teslamate-fuel-roi` image. Its entrypoint runs `fetch.sh`
   then `import.sh`, so one container run downloads the report, validates it,
   and imports any previously unseen dates.
+
+## Build the image
+
+Build the `teslamate-fuel-roi:dev` image from the repository root:
+
+```sh
+docker build -f docker/Dockerfile -t teslamate-fuel-roi:dev .
+```
+
+The Compose service below also declares a `build:` context and builds this image
+automatically when it is missing. For Kubernetes the image must be made
+available to the cluster — see [`kubernetes/README.md`](kubernetes/README.md).
 
 ## Quick start (Docker Compose)
 

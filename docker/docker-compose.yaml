@@ -1,5 +1,8 @@
 services:
   fuel-roi:
     image: teslamate-fuel-roi:dev
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
     env_file: .env
     restart: "no"

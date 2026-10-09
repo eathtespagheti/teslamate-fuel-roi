@@ -1,0 +1,11 @@
+.git
+.github
+.gitlab-ci.yml
+.gitignore
+.dockerignore
+CHANGELOG.md
+README.md
+dashboards
+kubernetes
+test
+docs

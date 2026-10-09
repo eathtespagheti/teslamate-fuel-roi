@@ -15,6 +15,22 @@ twice (`backoffLimit: 2`).
 The pod runs as non-root (`runAsNonRoot: true`, UID/GID `10001`, matching the
 image's `fuelroi` user).
 
+## Image
+
+The `CronJob` references the image `teslamate-fuel-roi:dev`, which is not
+published to any registry. Build it from the repository root:
+
+```sh
+docker build -f docker/Dockerfile -t teslamate-fuel-roi:dev .
+```
+
+Then make it available to the cluster: either load it into the nodes' container
+runtime (for example `kind load docker-image teslamate-fuel-roi:dev` or
+`k3d image import teslamate-fuel-roi:dev`) or push it to a registry the cluster
+can pull from and update `image:` in `kubernetes/cronjob.yaml` accordingly.
+Because the tag is not `latest`, the pod's default `imagePullPolicy:
+IfNotPresent` uses the loaded image instead of trying to pull it.
+
 ## Namespace
 
 The default namespace comes from `kubernetes/kustomization.yaml`:

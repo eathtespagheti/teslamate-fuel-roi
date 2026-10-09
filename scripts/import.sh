@@ -12,6 +12,10 @@ set -eu
 
 INPUT="${INPUT:-/tmp/fuel-prices.csv}"
 
+# libpq defaults PGDATABASE to the OS user; the project's documented default is
+# `teslamate`. Default it here, but let an explicit PGDATABASE win.
+export PGDATABASE="${PGDATABASE:-teslamate}"
+
 echo "Ensuring schema and table..."
 psql -v ON_ERROR_STOP=1 <<'SQL'
 CREATE SCHEMA IF NOT EXISTS fuel;

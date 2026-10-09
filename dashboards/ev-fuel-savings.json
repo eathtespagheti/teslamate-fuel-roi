@@ -304,6 +304,68 @@
       "type": "timeseries"
     },
     {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "TeslaMate"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "currencyEUR"
+        },
+        "overrides": []
+      },
       "gridPos": {
         "h": 14,
         "w": 24,
@@ -311,11 +373,35 @@
         "y": 13
       },
       "id": 6,
-      "libraryPanel": {
-        "name": "Fuel prices comparison",
-        "uid": "cfzjekal43wn4e"
+      "options": {
+        "annotations": {
+          "clustering": -1,
+          "multiLane": false
+        },
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "enableFacetedFilter": false,
+          "overflow": "ellipsis",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
       },
-      "title": "Fuel prices comparison"
+      "pluginVersion": "13.1.3",
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT rilevazione AS time, benzina AS \"Benzina (€/L)\", gasolio_auto AS \"Diesel (€/L)\", gpl AS \"GPL (€/L)\", metano AS \"Methane (€/L)\", gnl AS \"CNG (€/L)\", gasolio_riscaldamento AS \"Heating oil (€/L)\", oc_fluido_btz AS \"BTZ fluid (€/L)\", oc_denso_btz AS \"BTZ dense (€/L)\" FROM fuel.prices WHERE rilevazione >= '2024-01-01' ORDER BY rilevazione",
+          "refId": "A"
+        }
+      ],
+      "title": "Fuel prices comparison",
+      "type": "timeseries"
     }
   ],
   "preload": false,
