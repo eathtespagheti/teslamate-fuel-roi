@@ -1,0 +1,26 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: fuel-roi
+spec:
+  # Mondays at 20:00, after MASE publishes the weekly report.
+  schedule: "0 20 * * 1"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        spec:
+          restartPolicy: OnFailure
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 10001
+            runAsGroup: 10001
+          containers:
+            - name: fuel-roi
+              image: teslamate-fuel-roi:dev
+              envFrom:
+                - secretRef:
+                    name: fuel-roi-db

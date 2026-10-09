@@ -43,6 +43,30 @@ the weekly report:
 
 ## Quick start (Kubernetes)
 
+From the repository root, create the database Secret and apply the Kustomize
+overlay:
+
+```sh
+kubectl -n teslamate create secret generic fuel-roi-db \
+  --from-literal=PGHOST=teslamate-postgres-rw \
+  --from-literal=PGPORT=5432 \
+  --from-literal=PGUSER=teslamate \
+  --from-literal=PGPASSWORD="$PGPASSWORD" \
+  --from-literal=PGDATABASE=teslamate
+
+kubectl apply -k kubernetes/
+```
+
+The overlay deploys a single `CronJob` named `fuel-roi` that runs every Monday
+at 20:00, fetching and importing the MASE report in one container run. Its
+default namespace is `teslamate` (TeslaMate's namespace); change it in
+`kubernetes/kustomization.yaml` if your TeslaMate runs elsewhere. The container
+takes its connection details from the `fuel-roi-db` Secret, which must use the
+`PG*` keys shown above — reusing CloudNativePG's `teslamate-postgres-app` Secret
+directly does not work because `envFrom` cannot rename its keys. See
+[`kubernetes/README.md`](kubernetes/README.md) for the full walkthrough,
+including the CNPG mapping.
+
 ## Dashboards
 
 ## Configuration
