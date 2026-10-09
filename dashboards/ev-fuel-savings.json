@@ -1,0 +1,382 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "links": [],
+  "panels": [
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "TeslaMate"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "text",
+            "fixedColorMode": "light",
+            "mode": "fixed"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "km"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 8,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "13.1.3",
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT COALESCE(SUM(ep.odometer-sp.odometer),0) AS value FROM drives d JOIN positions sp ON sp.id=d.start_position_id JOIN positions ep ON ep.id=d.end_position_id WHERE d.car_id IN ($car_id) AND $__timeFilter(d.start_date) AND d.end_date IS NOT NULL",
+          "refId": "A"
+        }
+      ],
+      "title": "Distance driven (km)",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "TeslaMate"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "text",
+            "fixedColorMode": "light",
+            "mode": "fixed"
+          },
+          "decimals": 2,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "currencyEUR"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 8,
+        "x": 8,
+        "y": 0
+      },
+      "id": 4,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "13.1.3",
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT COALESCE(SUM((ep.odometer - sp.odometer) / NULLIF($consumption_km_l,0) * fp.price),0) AS value FROM drives d JOIN positions sp ON sp.id=d.start_position_id JOIN positions ep ON ep.id=d.end_position_id LEFT JOIN LATERAL (SELECT CASE '$fuel_type' WHEN 'benzina' THEN benzina WHEN 'gasolio_auto' THEN gasolio_auto WHEN 'gpl' THEN gpl WHEN 'metano' THEN metano WHEN 'gnl' THEN gnl WHEN 'gasolio_riscaldamento' THEN gasolio_riscaldamento WHEN 'oc_fluido_btz' THEN oc_fluido_btz WHEN 'oc_denso_btz' THEN oc_denso_btz ELSE gasolio_auto END AS price FROM fuel.prices WHERE rilevazione <= d.start_date::date ORDER BY rilevazione DESC LIMIT 1) fp ON true WHERE d.car_id IN ($car_id) AND $__timeFilter(d.start_date) AND d.end_date IS NOT NULL",
+          "refId": "A"
+        }
+      ],
+      "title": "Gross fuel cost avoided",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "TeslaMate"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "fixedColor": "text",
+            "fixedColorMode": "light",
+            "mode": "fixed"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              }
+            ]
+          },
+          "unit": "liters"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 8,
+        "x": 16,
+        "y": 0
+      },
+      "id": 2,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "13.1.3",
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "SELECT COALESCE(SUM((ep.odometer-sp.odometer)/NULLIF($consumption_km_l,0)),0) AS value FROM drives d JOIN positions sp ON sp.id=d.start_position_id JOIN positions ep ON ep.id=d.end_position_id WHERE d.car_id IN ($car_id) AND $__timeFilter(d.start_date) AND d.end_date IS NOT NULL",
+          "refId": "A"
+        }
+      ],
+      "title": "Fuel litres avoided",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "TeslaMate"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "showValues": false,
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "currencyEUR"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 24,
+        "x": 0,
+        "y": 4
+      },
+      "id": 5,
+      "options": {
+        "annotations": {
+          "clustering": -1,
+          "multiLane": false
+        },
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "enableFacetedFilter": false,
+          "overflow": "ellipsis",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "pluginVersion": "13.1.3",
+      "targets": [
+        {
+          "format": "table",
+          "rawSql": "WITH weekly_fuel AS (SELECT date_trunc('week', d.start_date) AS period_start, SUM((ep.odometer - sp.odometer) / NULLIF($consumption_km_l,0) * fp.price) AS fuel_cost FROM drives d JOIN positions sp ON sp.id=d.start_position_id JOIN positions ep ON ep.id=d.end_position_id LEFT JOIN LATERAL (SELECT CASE '$fuel_type' WHEN 'benzina' THEN benzina WHEN 'gasolio_auto' THEN gasolio_auto WHEN 'gpl' THEN gpl WHEN 'metano' THEN metano WHEN 'gnl' THEN gnl WHEN 'gasolio_riscaldamento' THEN gasolio_riscaldamento WHEN 'oc_fluido_btz' THEN oc_fluido_btz WHEN 'oc_denso_btz' THEN oc_denso_btz ELSE gasolio_auto END AS price FROM fuel.prices WHERE rilevazione <= d.start_date::date ORDER BY rilevazione DESC LIMIT 1) fp ON true WHERE d.car_id IN ($car_id) AND $__timeFilter(d.start_date) AND d.end_date IS NOT NULL GROUP BY 1), weekly_electricity AS (SELECT date_trunc('week', start_date) AS period_start, SUM(cost) AS electricity_cost FROM charging_processes WHERE car_id IN ($car_id) AND $__timeFilter(start_date) AND cost IS NOT NULL GROUP BY 1), weekly_savings AS (SELECT COALESCE(d.period_start,e.period_start) AS period_start, COALESCE(d.fuel_cost,0) AS fuel_cost, COALESCE(e.electricity_cost,0) AS electricity_cost FROM weekly_fuel d FULL OUTER JOIN weekly_electricity e USING(period_start)) SELECT period_start AS time, fuel_cost AS \"Fuel cost avoided (€)\", electricity_cost AS \"Electricity (€)\", fuel_cost-electricity_cost AS \"Savings this week (€)\", SUM(fuel_cost-electricity_cost) OVER(ORDER BY period_start) AS \"Cumulative net savings (€)\" FROM weekly_savings ORDER BY period_start",
+          "refId": "A"
+        }
+      ],
+      "title": "Weekly gross and net savings",
+      "type": "timeseries"
+    },
+    {
+      "gridPos": {
+        "h": 14,
+        "w": 24,
+        "x": 0,
+        "y": 13
+      },
+      "id": 6,
+      "libraryPanel": {
+        "name": "Fuel prices comparison",
+        "uid": "cfzjekal43wn4e"
+      },
+      "title": "Fuel prices comparison"
+    }
+  ],
+  "preload": false,
+  "refresh": "5m",
+  "schemaVersion": 42,
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "grafana-postgresql-datasource",
+          "uid": "TeslaMate"
+        },
+        "includeAll": true,
+        "label": "Car",
+        "name": "car_id",
+        "options": [],
+        "query": "SELECT id AS __value, name AS __text FROM cars ORDER BY id",
+        "regexApplyTo": "value",
+        "type": "query"
+      },
+      {
+        "current": {
+          "text": "16",
+          "value": "16"
+        },
+        "label": "Diesel efficiency (km/L)",
+        "name": "consumption_km_l",
+        "query": "16",
+        "type": "textbox"
+      },
+      {
+        "current": {
+          "text": "Diesel",
+          "value": "gasolio_auto"
+        },
+        "datasource": {
+          "type": "grafana-postgresql-datasource",
+          "uid": "TeslaMate"
+        },
+        "includeAll": false,
+        "label": "Fuel type",
+        "name": "fuel_type",
+        "options": [],
+        "query": "SELECT 'benzina' AS __value, 'Benzina' AS __text UNION ALL SELECT 'gasolio_auto', 'Diesel' UNION ALL SELECT 'gpl', 'GPL' UNION ALL SELECT 'metano', 'Methane' UNION ALL SELECT 'gnl', 'CNG' UNION ALL SELECT 'gasolio_riscaldamento', 'Heating oil' UNION ALL SELECT 'oc_fluido_btz', 'BTZ fluid' UNION ALL SELECT 'oc_denso_btz', 'BTZ dense'",
+        "regexApplyTo": "value",
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "2026-02-15T23:00:00.000Z",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "EV Fuel Savings",
+  "uid": "ev-fuel-savings",
+  "weekStart": ""
+}

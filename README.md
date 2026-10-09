@@ -69,6 +69,35 @@ including the CNPG mapping.
 
 ## Dashboards
 
+Two Grafana dashboards live in `dashboards/` as provision-ready JSON:
+
+- **`ev-fuel-savings.json`** (UID `ev-fuel-savings`) — gross and net fuel
+  savings. Stat panels show distance driven, litres of fuel avoided, and the
+  fuel cost avoided; the `Weekly gross and net savings` timeseries (and the
+  `Fuel prices comparison` row) break it down over time.
+- **`ev-roi.json`** (UID `ev-roi`) — return on investment against the EV
+  purchase price: net savings in range, average weekly net savings, a
+  break-even progress gauge, distance driven, the estimated break-even date,
+  and cumulative/weekly savings timeseries.
+
+Both dashboards read TeslaMate's Postgres tables plus the `fuel.prices` table
+created by this project, through a datasource whose UID is **`TeslaMate`**.
+Before importing, point them at your own datasource: either keep your
+TeslaMate/CloudNativePG datasource UID as `TeslaMate`, or edit the `uid` values
+in the JSON files to match. The `fuel.prices` rows must be imported first (see
+above) or the price panels will be empty.
+
+`purchase_cost` is a text-box variable on the ROI dashboard (the hidden
+`purchase_cost_neg` variable is derived from it). It defaults to the example
+`30000` (EUR) in the committed JSON — **set your own** EV purchase price, either
+in Grafana (`Dashboard settings → Variables → purchase_cost`) or by editing the
+`purchase_cost` `query`/`current` in `dashboards/ev-roi.json`.
+
+To provision the dashboards, see
+[`dashboards/provisioning.example.yaml`](dashboards/provisioning.example.yaml):
+copy the JSON files and the provider YAML into your Grafana provisioning
+directory (`/etc/grafana/provisioning/dashboards`) and restart Grafana.
+
 ## Configuration
 
 | Variable | Default | Notes |

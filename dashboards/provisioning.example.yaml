@@ -1,0 +1,28 @@
+# Example Grafana file-provisioning provider for the dashboards in this
+# directory.
+#
+# Install it by:
+#   1. copying this file to
+#        /etc/grafana/provisioning/dashboards/teslamate-fuel-roi.yaml
+#   2. copying the JSON dashboards next to it, so they land under the
+#      provider's options.path:
+#        /etc/grafana/provisioning/dashboards/*.json
+#      (or mount this whole directory at that path), and
+#   3. restarting Grafana. The provider then loads and watches the folder.
+#
+# The dashboards read from a Postgres datasource whose UID is `TeslaMate`.
+# Either keep your TeslaMate/CloudNativePG datasource UID as `TeslaMate`, or
+# edit the `uid` values in the JSON files to match your own datasource.
+apiVersion: 1
+
+providers:
+  - name: teslamate-fuel-roi
+    orgId: 1
+    folder: TeslaMate
+    type: file
+    disableDeletion: false
+    allowUiUpdates: true
+    updateIntervalSeconds: 30
+    options:
+      path: /etc/grafana/provisioning/dashboards
+      foldersFromFilesStructure: false
