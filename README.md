@@ -2,6 +2,30 @@
 
 ## What it is
 
+`teslamate-fuel-roi` loads Italy's official weekly fuel prices into your
+TeslaMate Postgres and ships two Grafana dashboards that turn TeslaMate's trip
+data into fuel cost avoided and EV return on investment.
+
+**This project is Italy-only.** The price source is the Italian MASE
+(Ministero dell'Ambiente e della Sicurezza Energetica) weekly report, and the
+`fuel.prices` table stores exactly its columns. A country/provider abstraction
+is explicitly out of scope; the feed, schema, and dashboards all assume Italian
+fuel prices, so this will not work unchanged outside Italy.
+
+One container runs `fetch.sh` then `import.sh` in a single pass: it downloads
+and fail-closed-validates the MASE report, converts it to CSV, and upserts
+previously unseen weeks into a `fuel.prices` table alongside your existing
+TeslaMate data. Run it weekly from Docker Compose via host cron or a systemd
+timer, or as a Kubernetes `CronJob`. The `ev-fuel-savings` dashboard reports
+gross and net fuel savings; `ev-roi` tracks net savings against a configurable EV
+purchase price and estimates a break-even date.
+
+The design and plan for this extraction live in the `home-cluster` repo under
+`/home/fabio/Projects/home-cluster/docs/superpowers/`:
+
+- `docs/superpowers/specs/2026-10-09-teslamate-fuel-roi-design.md` (design)
+- `docs/superpowers/plans/2026-10-09-teslamate-fuel-roi.md` (plan)
+
 ## Prerequisites
 
 - A running TeslaMate Postgres, reachable through libpq's standard `PG*`
@@ -131,4 +155,21 @@ added. Connection details come from libpq's standard `PG*` environment
 variables.
 
 ## Credits and license
+
+This project is **not affiliated with, sponsored by, or endorsed by
+TeslaMate**. It reads from a TeslaMate Postgres database, and the dashboards
+query TeslaMate's tables, but it does not modify TeslaMate itself.
+[TeslaMate](https://github.com/teslamate/teslamate) is licensed under the
+**AGPL-3.0**; this project and its dashboards are independent works released
+under the **MIT** license (see [`LICENSE`](LICENSE)).
+
+The fuel prices come from the Italian **MASE** (Ministero dell'Ambiente e della
+Sicurezza Energetica) weekly price report. The feed is fetched **at runtime** by
+`fetch.sh`; no MASE dataset is committed to this repository or redistributed.
+You are responsible for complying with MASE's own reuse and attribution terms.
+
+To stay clear of TeslaMate's AGPL-3.0 licensing, the upstream Trip dashboard's
+"Comparison with ICE" panel is **intentionally not included** in this project.
+
+Released under the MIT License — see [`LICENSE`](LICENSE).
 
