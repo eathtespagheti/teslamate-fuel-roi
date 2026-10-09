@@ -1,0 +1,26 @@
+# GitLab CI (primary): lint the scripts and run the full test suite against a
+# throwaway PostgreSQL service.
+stages:
+  - test
+
+shellcheck-and-smoke-test:
+  stage: test
+  # postgres:18-alpine provides psql for the importer test.
+  image: postgres:18-alpine
+  services:
+    - name: postgres:18-alpine
+      alias: postgres
+      variables:
+        POSTGRES_HOST_AUTH_METHOD: trust
+  variables:
+    POSTGRES_HOST_AUTH_METHOD: trust
+    PGHOST: postgres
+    PGPORT: "5432"
+    PGUSER: postgres
+    PGDATABASE: postgres
+  before_script:
+    # curl and jq are required by scripts/fetch.sh; shellcheck lints the scripts.
+    - apk add --no-cache shellcheck bash curl jq
+  script:
+    - shellcheck scripts/*.sh
+    - sh test/run.sh

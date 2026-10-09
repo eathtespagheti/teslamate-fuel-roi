@@ -1,0 +1,39 @@
+# GitHub Actions (mirror of the GitLab CI pipeline): lint the scripts and run
+# the full test suite against a throwaway PostgreSQL service.
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  shellcheck-and-smoke-test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      PGHOST: 127.0.0.1
+      PGPORT: "5432"
+      PGUSER: postgres
+      PGDATABASE: postgres
+    steps:
+      - uses: actions/checkout@v4
+      - name: shellcheck
+        run: |
+          if ! command -v shellcheck >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install -y shellcheck
+          fi
+          shellcheck scripts/*.sh
+      - name: Smoke test
+        run: sh test/run.sh
