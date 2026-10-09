@@ -18,6 +18,7 @@
 | `MIN_ROWS` | `1000` | Sanity guard: abort if the response has fewer rows; raise/lower for tests |
 | `MAX_AGE_DAYS` | `14` | Staleness guard: abort if the newest `DATA_RILEVAZIONE` is older |
 | `OUTPUT` | `/tmp/fuel-prices.csv` | CSV destination for `fetch.sh` |
+| `INPUT` | `/tmp/fuel-prices.csv` | CSV source for `import.sh` (default matches `fetch.sh`'s `OUTPUT`) |
 | `PGHOST` / `PGPORT` | — | libpq standard (read by `import.sh`) |
 | `PGUSER` / `PGPASSWORD` | — | libpq standard |
 | `PGDATABASE` | `teslamate` | libpq standard |
@@ -33,6 +34,13 @@ check passes does it write the CSV — converting the eight price columns from
 EUR/1000 L to EUR/L, preserving `null`s — to a temporary file and move it onto
 `OUTPUT`. Any failure exits 1 and leaves `OUTPUT` untouched, so a broken, empty,
 malformed, or stale MASE feed can never overwrite good data.
+
+`scripts/import.sh` then stages that CSV into a throwaway `fuel.prices_stage`
+table (dropped and recreated on every run) and merges it into `fuel.prices`
+with `INSERT … ON CONFLICT (rilevazione) DO NOTHING`, so re-importing the same
+or an overlapping file is idempotent and only previously unseen dates are
+added. Connection details come from libpq's standard `PG*` environment
+variables.
 
 ## Credits and license
 

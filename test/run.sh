@@ -44,6 +44,27 @@ test_fetch_unexpected_shape_fails() {
   rm -f "$out"
 }
 
+# Import tests need a reachable throwaway Postgres. The psql client and
+# import.sh read PGHOST/PGPORT/PGUSER/PGPASSWORD/PGDATABASE from the
+# environment; when PGHOST is unset this test is SKIPped (see the runner at
+# the bottom) so the fetch-only suite still runs without a database.
+test_import_loads_and_is_idempotent() {
+  psql -c 'DROP SCHEMA IF EXISTS fuel CASCADE' >/dev/null
+  csv="$(mktemp)"
+  OUTPUT="$csv" MASE_URL="file://$ROOT/test/fixture.json" MIN_ROWS=1 MAX_AGE_DAYS=100000 sh "$ROOT/scripts/fetch.sh" >/dev/null
+  PGPASSWORD="${PGPASSWORD:-}" INPUT="$csv" sh "$ROOT/scripts/import.sh" >/dev/null
+  assert_eq "$(psql -tAc 'SELECT count(*) FROM fuel.prices')" "3"
+  assert_eq "$(psql -tAc "SELECT benzina FROM fuel.prices WHERE rilevazione='2026-01-05'")" "1.80000"
+  assert_eq "$(psql -tAc "SELECT gpl IS NULL FROM fuel.prices WHERE rilevazione='2026-01-12'")" "t"
+  if PGPASSWORD="${PGPASSWORD:-}" INPUT="$csv" sh "$ROOT/scripts/import.sh" 2>&1 | grep -q 'Inserted 0 new row(s)'; then
+    assert_eq ok ok
+  else
+    assert_eq "idempotent-line-missing" "ok"
+  fi
+  assert_eq "$(psql -tAc 'SELECT count(*) FROM fuel.prices')" "3"
+  rm -f "$csv"
+}
+
 # Run each test in isolation so one failure does not mask another.
 TOTAL_FAIL=0
 run_test() {
@@ -62,5 +83,11 @@ run_test test_fetch_success
 run_test test_fetch_short_response_fails
 run_test test_fetch_stale_fails
 run_test test_fetch_unexpected_shape_fails
+
+if [ -n "${PGHOST:-}" ]; then
+  run_test test_import_loads_and_is_idempotent
+else
+  echo "SKIP test_import_loads_and_is_idempotent (PGHOST unset)"
+fi
 
 exit "$TOTAL_FAIL"
